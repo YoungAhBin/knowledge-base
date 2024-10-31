@@ -1,6 +1,6 @@
 #pinecone实现向量存储与查询的基础逻辑
 
-'''python
+'''bash
 # 配置环境
 
 # !pip3 install -qU \
