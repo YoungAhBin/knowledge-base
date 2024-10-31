@@ -1,6 +1,6 @@
-#pinecone实现向量存储与查询的基础逻辑
+# pinecone实现向量存储与查询的基础逻辑
 
-'''bash
+```python
 # 配置环境
 
 # !pip3 install -qU \
@@ -260,6 +260,6 @@ demo_index.query(
     include_metadata=True,
     namespace=targeted_namespace
 )
-'''
+```
 
 # 简单开始案例
