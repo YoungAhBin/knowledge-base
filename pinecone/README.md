@@ -263,3 +263,91 @@ demo_index.query(
 ```
 
 # 简单开始案例
+
+```python
+# 安装需要的库
+pip install pinecone
+
+# 配置密钥
+PINECONE_API_KEY="YOUR_API_KEY"
+
+# 导入包
+from pinecone import Pinecone, ServerlessSpec
+
+# 初始化一个pinecone对象，pinecone对象用于与pinecone建立连接上传数据使用
+pc = Pinecone(api_key="YOUR_API_KEY")
+
+# 创建一个无服务器索引对象存储管理数据。无服务器架构，会自动将数据存储在其指定的云平台（例如亚马逊的 AWS 上），并在后台管理所有的存储资源。你只需通过 Pinecone 提供的 API 来进行数据的上传、查询和管理操作，所有的底层存储和计算资源都由 Pinecone 负责配置和优化。具体来说，当你使用 ServerlessSpec 配置 AWS 云时，Pinecone 会将你的索引数据保存在 AWS 的对象存储（如 S3）上，并通过 Pinecone 的 API 调用来访问这些数据。这样，你既不需要配置 AWS 的存储资源，也不需要维护数据库和索引结构的运行状态。Pinecone 的这种架构使得用户只需按实际使用量支付费用，同时可以享受自动扩展的云资源管理。无服务器架构索引自动帮你配置数据库和管理数据，它里面有接口连接亚马逊云服务器，是他们自己的亚马逊云服务器，不需要你自己注册配置亚马逊云服务器，付费用他们的就可以。还有pod架构的服务器索引对象，在本地建立存储服务器。
+index_name = "quickstart"
+pc.create_index(
+    name=index_name,
+    dimension=1024, # Replace with your model dimensions
+    metric="cosine", # Replace with your model metric
+    spec=ServerlessSpec(
+        cloud="aws",
+        region="us-east-1"
+    ) 
+)
+
+# 向量化存储数据
+data = [
+    {"id": "vec1", "text": "Apple is a popular fruit known for its sweetness and crisp texture."},
+    {"id": "vec2", "text": "The tech company Apple is known for its innovative products like the iPhone."},
+    {"id": "vec3", "text": "Many people enjoy eating apples as a healthy snack."},
+    {"id": "vec4", "text": "Apple Inc. has revolutionized the tech industry with its sleek designs and user-friendly interfaces."},
+    {"id": "vec5", "text": "An apple a day keeps the doctor away, as the saying goes."},
+    {"id": "vec6", "text": "Apple Computer Company was founded on April 1, 1976, by Steve Jobs, Steve Wozniak, and Ronald Wayne as a partnership."}
+]
+
+embeddings = pc.inference.embed(
+    model="multilingual-e5-large",
+    inputs=[d['text'] for d in data],
+    parameters={"input_type": "passage", "truncate": "END"}
+)
+print(embeddings[0])
+
+# 上传数据到索引
+# Wait for the index to be ready
+while not pc.describe_index(index_name).status['ready']:
+    time.sleep(1)
+
+index = pc.Index(index_name)
+
+vectors = []
+for d, e in zip(data, embeddings):
+    vectors.append({
+        "id": d['id'],
+        "values": e['values'],
+        "metadata": {'text': d['text']}
+    })
+
+index.upsert(
+    vectors=vectors,
+    namespace="ns1"
+)
+
+# 核查索引
+print(index.describe_index_stats())
+
+# 查询问题向量化
+query = "Tell me about the tech company known as Apple."
+
+embedding = pc.inference.embed(
+    model="multilingual-e5-large",
+    inputs=[query],
+    parameters={
+        "input_type": "query"
+    }
+)
+
+# 建立查询
+results = index.query(
+    namespace="ns1",
+    vector=embedding[0].values,
+    top_k=3,
+    include_values=False,
+    include_metadata=True
+)
+
+print(results)
+```
