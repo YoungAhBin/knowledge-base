@@ -1,7 +1,7 @@
 from pinecone import Pinecone, ServerlessSpec
 
 # 环境变量设置api_key
-pc = Pinecone(api_key="")
+pc = Pinecone(api_key="YOUR_API_KEY")
 
 # 填入索引名，类似于数据库名
 index_name = "documentation-read"
