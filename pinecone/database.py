@@ -65,6 +65,7 @@ embedding = pc.inference.embed(
     }
 )
 
+# 这里通过向量相似度查询，top_k设定返回几个结果。也可以通过id精确查询，id="B"；也可以经过metadata进行筛选查询，在筛选的范围内进行向量查询，filter={"genre": {"$eq": "documentary"}}。
 results = index.query(
     namespace="tong-wang-nu-yi-zhi-lu",
     vector=embedding[0].values,
