@@ -1,4 +1,7 @@
 # 文字识别使用腾讯云的智能文档识别接口进行识别
+
+（来源于https://console.cloud.tencent.com/api/explorer?Product=ocr&Version=2018-11-19&Action=ReconstructDocument）
+
 ```python
 # 识别接口的输出我们不能改变，但输出的json内容中有三个参数，提取这三个参数的内容，可以呈现不同的输出方式
 
