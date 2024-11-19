@@ -1,4 +1,6 @@
-# openai接口访问的的示例模板（来源于github上https://github.com/openai/openai-python）
+# openai接口访问的的示例模板
+
+（来源于github上https://github.com/openai/openai-python）
 
 ```python
 import os
